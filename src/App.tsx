@@ -1,35 +1,51 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import "./App.css";
+import { useState } from "react";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [itemsInCart, setItems] = useState(0);
+  const [lines, setlines] = useState([[10, 5, 2], [34], [2, 4, 5, 6], [3], [4]]);
 
+  const onCheckout = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    let leastAmount: number | undefined;
+    let currentIndex = 0;
+    let lineWithLeast: number | undefined;
+
+    for (const line of lines) {
+      const totalInLine: number = line.reduce(
+        (total: number, item: number): number => total + item,
+        0
+      );
+      if (leastAmount === undefined || totalInLine < leastAmount) {
+        leastAmount = totalInLine;
+        lineWithLeast = currentIndex;
+      }
+      currentIndex++;
+    }
+
+    console.log(lineWithLeast);
+  };
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <main>
+      <form onSubmit={onCheckout}>
+        <input
+          required
+          type="number"
+          value={itemsInCart}
+          onChange={(e) => {
+            setItems(e.currentTarget.valueAsNumber);
+          }}
+        />
+        <button type="submit">Checkout!</button>
+      </form>
+      <div className="lines">
+        {" "}
+        {lines.map((people, index) => (
+          <div key={index}>X</div>
+        ))}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </main>
+  );
 }
 
-export default App
+export default App;
