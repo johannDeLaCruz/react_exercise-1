@@ -1,9 +1,15 @@
 import "./App.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function App() {
-  const [itemsInCart, setItems] = useState(0);
-  const [lines, setlines] = useState([[10, 5, 2], [34], [2, 4, 5, 6], [3], [4]]);
+  const [itemsInCart, setItems] = useState<number>(0);
+  const [lines, setLines] = useState([
+    [10, 5, 2],
+    [34],
+    [2, 4, 5, 6],
+    [5],
+    [8],
+  ]);
 
   const onCheckout = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -23,8 +29,27 @@ function App() {
       currentIndex++;
     }
 
+    if (lineWithLeast !== undefined) {
+      setLines((prevLines) => {
+        const newLine = [...prevLines];
+        newLine[lineWithLeast!] = [itemsInCart, ...newLine[lineWithLeast!]];
+        return newLine;
+      });
+    }
     console.log(lineWithLeast);
   };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLines((prevLines) =>
+        prevLines.map((line) =>
+          [line[0] - 1, ...line.slice(1)].filter((value) => value >= 0)
+        )
+      );
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <main>
       <form onSubmit={onCheckout}>
@@ -40,8 +65,12 @@ function App() {
       </form>
       <div className="lines">
         {" "}
-        {lines.map((people, index) => (
-          <div key={index}>X</div>
+        {lines.map((line, index) => (
+          <div key={index}>
+            {line.map((numberOfItems, itemIndex) => (
+              <div key={itemIndex}>{numberOfItems}</div>
+            ))}
+          </div>
         ))}
       </div>
     </main>
