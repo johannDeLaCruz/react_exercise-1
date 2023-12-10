@@ -3,28 +3,32 @@ import { useMemo, useState } from "react";
 const itemCategory = ["Fruit", "Vegetable", "Nut"] as const;
 
 type ItemName = string;
-type ItemCategory = (typeof itemCategory)[number];
-type Item = { name: ItemName; category: ItemCategory };
+type ItemCategory = (typeof itemCategory)[number] | "All";
+type Item = { name: ItemName; category: ItemCategory[] };
 type ItemsList = Item[];
 
 const ReactToDoList = () => {
   const initialItemsList: ItemsList = [
-    { name: "Mango", category: "Fruit" },
-    { name: "Pineapple", category: "Fruit" },
-    { name: "Cabbage", category: "Vegetable" },
-    { name: "Banana", category: "Fruit" },
-    { name: "Pistache", category: "Nut" },
+    { name: "Mango", category: ["Fruit", "All" ]},
+    { name: "Pineapple", category: ["Fruit", "All" ]},
+    { name: "Cabbage", category: ["Vegetable", "All"] },
+    { name: "Banana", category: ["Fruit", "All"] },
+    { name: "Pistache", category: ["Nut", "All" ]},
   ];
 
   const [itemList, setItemList] = useState<ItemsList>(initialItemsList);
   const [itemInput, setItemInput] = useState<ItemName>("");
-  const [categoryInput, setCategoryInput] = useState<ItemCategory>("");
+  const [categoryInput, setCategoryInput] = useState<ItemCategory>("All");
+  const [category, setCategory] = useState<ItemCategory>("All");
   const [query, setQuery] = useState<ItemName>("");
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (itemInput === "") return;
-    setItemList((prevList) => [...prevList, itemInput]);
+    setItemList((prevList) => [
+      ...prevList,
+      { name: itemInput, category: [category, "All"] }, 
+    ]);
     setItemInput("");
   };
 
@@ -50,8 +54,7 @@ const ReactToDoList = () => {
         value={categoryInput}
         onChange={(e) => setCategoryInput(e.target.value as ItemCategory)}
       >
-        {" "}
-        <option value="">Select By</option>
+        <option value="All">All</option>
         {itemCategory.map((item, index) => (
           <option key={index} value={item}>
             {item}
@@ -68,7 +71,7 @@ const ReactToDoList = () => {
         }}
         onSubmit={handleSubmit}
       >
-        <label htmlFor="task-input">Task:</label>
+        <label htmlFor="task-input">Product:</label>
         <input
           id="task-input"
           type="text"
@@ -76,6 +79,21 @@ const ReactToDoList = () => {
           value={itemInput}
           onChange={(e) => setItemInput(e.target.value)}
         />
+        <label htmlFor="category-input">Set Category:</label>
+        <select
+          name="category-input"
+          id="category-input"
+          onChange={(e) => setCategory(e.target.value as ItemCategory)}
+          value={category}
+          required
+        >
+          <option value="All">All</option>
+          {itemCategory.map((item, index) => (
+            <option key={index} value={item}>
+              {item}
+            </option>
+          ))}
+        </select>
         <button type="submit">Submit!</button>
       </form>
       <h1>Items:</h1>
