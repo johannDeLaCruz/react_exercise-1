@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./ReactQuizGame.css";
 
 type GameDataString = string[][];
@@ -16,18 +16,22 @@ const ReactQuizGame = () => {
     { city: "Madrid", country: "Spain" },
     { city: "Berlin", country: "Germany" },
     { city: "Santiago", country: "Chile" },
+    { city: "Brasília", country: "Brazil" },
+    { city: "Canberra", country: "Australia" },
   ];
   // const flattenedData: ItemsToCheck = gameData.flatMap((obj) =>
   //   Object.values(obj)
   // );
 
-  const shuffledData = shuffleArray(
-    gameData.flatMap((obj) => Object.values(obj))
-  );
-
+ 
   const [selectedItems, setSelectedItems] = useState<ItemsToCheck>([]);
   const [itemsToDisappear, setItemsToDisappear] = useState<ItemsToCheck>([]);
   const [wrongItems, setWrongItems] = useState<ItemsToCheck>([]);
+  const [shuffledData, setShuffledData] = useState<ItemsToCheck>([]);
+
+  useEffect(() => {
+    setShuffledData(shuffleArray(gameData.flatMap((obj) => Object.values(obj))));
+  }, []);
 
   const checkMatch = (itemsToCheck: ItemsToCheck): boolean => {
     const flatData: GameDataString = gameData.flatMap((obj) => [
