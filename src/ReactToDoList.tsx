@@ -32,6 +32,9 @@ const ReactToDoList = () => {
     setItemInput("");
   };
 
+  const disabledButton = itemInput.length < 2 && categoryInput !== "All";
+
+
   const filteredItems = useMemo(() => {
     return itemList
       .filter((item) => item.category.includes(categoryInput))
@@ -94,7 +97,7 @@ const ReactToDoList = () => {
             </option>
           ))}
         </select>
-        <button type="submit">Submit!</button>
+        <button disabled={disabledButton} type="submit">Submit!</button>
       </form>
       <h1>Items:</h1>
       <ul>

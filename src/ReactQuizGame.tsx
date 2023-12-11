@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+type GameDataString = string[][];
 type ItemsToCheck = string[];
 type DataItem = {
   city: string;
@@ -20,31 +21,63 @@ const ReactQuizGame = () => {
   );
 
   const [selectedItems, setSelectedItems] = useState<ItemsToCheck>([]);
-  
-  const checkMatch = (itemsToCheck) => {
-    
-    
-    
-    return
-  }
+  const [itemsToDisappear, setItemsToDisappear] = useState<ItemsToCheck>([]);
+  const [wrongItems, setWrongItems] = useState<ItemsToCheck>([]);
 
+  const checkMatch = (itemsToCheck: ItemsToCheck) => {
+    const flatData: GameDataString = gameData.flatMap((obj) => [
+      Object.values(obj),
+    ]);
+    const checkIfMatch = flatData.some((item) => {
+      return item.sort().join(",") === itemsToCheck.sort().join(",");
+    });
+    return checkIfMatch;
+  };
 
   const handleOnClick = (e: React.MouseEvent<HTMLButtonElement>): void => {
     const item: Item = (e.target as HTMLButtonElement).value;
-    if (selectedItems.length === 0 || selectedItems.length === 2) {
+
+    if (selectedItems.length === 0) {
       setSelectedItems([item]);
     } else if (selectedItems.length === 1) {
-      setSelectedItems((prevItems) => [...prevItems, item]);
+      const updatedItems = [...selectedItems, item];
+      const isMatch = checkMatch(updatedItems);
+
+      if (isMatch) {
+        setItemsToDisappear((prevItems) => [...prevItems, ...updatedItems]);
+        setSelectedItems(updatedItems);
+      } else {
+        setSelectedItems([]);
+        setWrongItems(updatedItems);
+      }
+    } else if (selectedItems.length === 2) {
+      setWrongItems([]);
+      setSelectedItems([item]);
     }
   };
 
+  console.log(wrongItems);
   return (
     <>
-      {flattenedData.map((item, index) => (
-        <button onClick={handleOnClick} key={index} value={item}>
-          {item}
-        </button>
-      ))}
+      {flattenedData.map(
+        (item, index) =>
+          !itemsToDisappear.some((i) => i === item) && (
+            <button
+              style={{
+                backgroundColor: selectedItems.some((i) => i === item)
+                  ? "blue"
+                  : wrongItems.some((i) => i === item)
+                  ? "red"
+                  : "inherit",
+              }}
+              onClick={handleOnClick}
+              key={index}
+              value={item}
+            >
+              {item}
+            </button>
+          )
+      )}
     </>
   );
 };
