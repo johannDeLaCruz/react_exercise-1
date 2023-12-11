@@ -4,7 +4,8 @@ import ReactDOM from 'react-dom/client'
 // import ReactAPIFetch from './ReactAPIFetch.tsx'
 // import ReactFetchPOST from './ReactFetchPOST.tsx'
 // import ReactLogged from './ReactLogged.tsx'
-import ReactToDoList from './ReactToDoList.tsx'
+// import ReactToDoList from './ReactToDoList.tsx'
+import ReactQuizGame from './ReactQuizGame'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -13,6 +14,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     {/* <ReactAPIFetch /> */}
     {/* <ReactFetchPOST /> */}
     {/* <ReactLogged /> */}
-    <ReactToDoList />
+    {/* <ReactToDoList /> */}
+    <ReactQuizGame />
   </React.StrictMode>,
 )
