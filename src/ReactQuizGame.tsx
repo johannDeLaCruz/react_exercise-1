@@ -1,4 +1,5 @@
 import { useState } from "react";
+import "./ReactQuizGame.css";
 
 type GameDataString = string[][];
 type ItemsToCheck = string[];
@@ -16,68 +17,83 @@ const ReactQuizGame = () => {
     { city: "Berlin", country: "Germany" },
     { city: "Santiago", country: "Chile" },
   ];
-  const flattenedData: ItemsToCheck = gameData.flatMap((obj) =>
-    Object.values(obj)
+  // const flattenedData: ItemsToCheck = gameData.flatMap((obj) =>
+  //   Object.values(obj)
+  // );
+
+  const shuffledData = shuffleArray(
+    gameData.flatMap((obj) => Object.values(obj))
   );
 
   const [selectedItems, setSelectedItems] = useState<ItemsToCheck>([]);
   const [itemsToDisappear, setItemsToDisappear] = useState<ItemsToCheck>([]);
   const [wrongItems, setWrongItems] = useState<ItemsToCheck>([]);
 
-  const checkMatch = (itemsToCheck: ItemsToCheck) => {
+  const checkMatch = (itemsToCheck: ItemsToCheck): boolean => {
     const flatData: GameDataString = gameData.flatMap((obj) => [
       Object.values(obj),
     ]);
-    const checkIfMatch = flatData.some((item) => {
+    const checkIfMatch: boolean = flatData.some((item) => {
       return item.sort().join(",") === itemsToCheck.sort().join(",");
     });
     return checkIfMatch;
   };
-
   const handleOnClick = (e: React.MouseEvent<HTMLButtonElement>): void => {
     const item: Item = (e.target as HTMLButtonElement).value;
+    setWrongItems([]);
 
-    if (selectedItems.length === 0) {
-      setSelectedItems([item]);
-    } else if (selectedItems.length === 1) {
-      const updatedItems = [...selectedItems, item];
-      const isMatch = checkMatch(updatedItems);
-
-      if (isMatch) {
-        setItemsToDisappear((prevItems) => [...prevItems, ...updatedItems]);
-        setSelectedItems(updatedItems);
-      } else {
+    if (selectedItems.length < 2) {
+      const updatedItems: ItemsToCheck = [...selectedItems, item];
+      if (updatedItems.length === 2) {
+        const isMatch: boolean = checkMatch(updatedItems);
         setSelectedItems([]);
-        setWrongItems(updatedItems);
+        if (isMatch) {
+          setItemsToDisappear((prevItems) => [...prevItems, ...updatedItems]);
+        } else {
+          setWrongItems(updatedItems);
+        }
+      } else {
+        setSelectedItems(updatedItems);
       }
-    } else if (selectedItems.length === 2) {
-      setWrongItems([]);
-      setSelectedItems([item]);
     }
   };
 
-  console.log(wrongItems);
+  function shuffleArray(array: ItemsToCheck): ItemsToCheck {
+    const shuffledArray: ItemsToCheck = array.slice();
+    // Fisher-Yates (Knuth) algorithm for shuffling
+    for (let i = shuffledArray.length - 1; i > 0; i--) {
+      const randomIndex: number = Math.floor(Math.random() * (i + 1));
+      // Swap elements between current position and random position
+      [shuffledArray[i], shuffledArray[randomIndex]] = [
+        shuffledArray[randomIndex],
+        shuffledArray[i],
+      ];
+    }
+    return shuffledArray;
+  }
   return (
     <>
-      {flattenedData.map(
-        (item, index) =>
-          !itemsToDisappear.some((i) => i === item) && (
-            <button
-              style={{
-                backgroundColor: selectedItems.some((i) => i === item)
-                  ? "blue"
-                  : wrongItems.some((i) => i === item)
-                  ? "red"
-                  : "inherit",
-              }}
-              onClick={handleOnClick}
-              key={index}
-              value={item}
-            >
-              {item}
-            </button>
-          )
-      )}
+      <div className="game">
+        {shuffledData.map(
+          (item, index) =>
+            !itemsToDisappear.some((i) => i === item) && (
+              <button
+                style={{
+                  backgroundColor: selectedItems.some((i) => i === item)
+                    ? "blue"
+                    : wrongItems.some((i) => i === item)
+                    ? "red"
+                    : "inherit",
+                }}
+                onClick={handleOnClick}
+                key={index}
+                value={item}
+              >
+                {item}
+              </button>
+            )
+        )}
+      </div>
     </>
   );
 };
